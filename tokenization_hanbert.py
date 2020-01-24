@@ -51,38 +51,37 @@ PRETRAINED_INIT_CONFIGURATION = {
     'HanBert-torch': {'do_lower_case': False},
 }
 
-moran = CDLL('/usr/local/moran/libmoran4dnlp.so')
-moran.Moran4dnlp.restype = c_char_p
-moran.Moran4dnlp.argtypes = [c_char_p, c_char_p, c_int]
-
-moran.Moran4match.restype = c_char_p
-moran.Moran4match.argtypes = [c_char_p, c_char_p, c_char_p, c_int]
-
-moran_input = create_string_buffer(102400)
-moran_input2 = create_string_buffer(102400)
-moran_output = create_string_buffer(102400)
-
 
 class MorAn16(object):
     def __init__(self):
-        moran.MorAn16_open_dbs()
+        self.moran = CDLL('/usr/local/moran/libmoran4dnlp.so')
+        self.moran.Moran4dnlp.restype = c_char_p
+        self.moran.Moran4dnlp.argtypes = [c_char_p, c_char_p, c_int]
+
+        self.moran.Moran4match.restype = c_char_p
+        self.moran.Moran4match.argtypes = [c_char_p, c_char_p, c_char_p, c_int]
+
+        self.moran_input = create_string_buffer(102400)
+        self.moran_input2 = create_string_buffer(102400)
+        self.moran_output = create_string_buffer(102400)
+        self.moran.MorAn16_open_dbs()
 
     def close(self):
-        moran.MorAn_close_dbs()
+        self.moran.MorAn_close_dbs()
 
     def run(self, text):
         result = list()
-        moran_input.value = text.encode()
-        x = moran.Moran4dnlp(moran_input, moran_output, 102400)
+        self.moran_input.value = text.encode()
+        x = self.moran.Moran4dnlp(self.moran_input, self.moran_output, 102400)
         y = x.decode()
         result = y.split()
         return result
 
     def match(self, text, tokens):
         result = list()
-        moran_input.value = text.encode()
-        moran_input2.value = tokens.encode()
-        x = moran.Moran4match(moran_input, moran_input2, moran_output, 102400)
+        self.moran_input.value = text.encode()
+        self.moran_input2.value = tokens.encode()
+        x = self.moran.Moran4match(self.moran_input, self.moran_input2, self.moran_output, 102400)
         y = x.decode()
         result = y.split()
         return result
