@@ -133,3 +133,4 @@ dmypy.json
 .idea/
 HanBert-torch/
 usr_local_moran/
+model/
