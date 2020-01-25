@@ -37,11 +37,12 @@ from transformers import PreTrainedTokenizer
 
 logger = logging.getLogger(__name__)
 
-VOCAB_FILES_NAMES = {'vocab_file': 'vocab_54k.txt'}
+VOCAB_FILES_NAMES = {'vocab_file': 'vocab_54k.txt',
+                     'moran_file': 'libmoran4dnlp.so'}
 
 PRETRAINED_VOCAB_FILES_MAP = {
-    'vocab_file': {
-    }
+    'vocab_file': {},
+    'moran_file': {}
 }
 
 PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
@@ -53,8 +54,8 @@ PRETRAINED_INIT_CONFIGURATION = {
 
 
 class MorAn16(object):
-    def __init__(self):
-        self.moran = CDLL('/usr/local/moran/libmoran4dnlp.so')
+    def __init__(self, moran_file='libmoran4dnlp.so'):
+        self.moran = CDLL(moran_file)
         self.moran.Moran4dnlp.restype = c_char_p
         self.moran.Moran4dnlp.argtypes = [c_char_p, c_char_p, c_int]
 
@@ -253,8 +254,8 @@ class FullTokenizer(object):
 class BasicTokenizer(object):
     """Runs basic tokenization (punctuation splitting, lower casing, etc.)."""
 
-    def __init__(self, use_moran=False, use_zwj=True):
-        self.moran = MorAn16()
+    def __init__(self, use_moran=False, use_zwj=True, moran_file='libmoran4dnlp.so'):
+        self.moran = MorAn16(moran_file)
         self.use_moran = use_moran
         self.use_zwj = use_zwj
 
@@ -500,7 +501,7 @@ class HanBertTokenizer(PreTrainedTokenizer):
     pretrained_init_configuration = PRETRAINED_INIT_CONFIGURATION
     max_model_input_sizes = PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES
 
-    def __init__(self, vocab_file, do_lower_case=False, never_split=None, do_basic_tokenize=True, use_moran=True,
+    def __init__(self, vocab_file, moran_file, do_lower_case=False, never_split=None, do_basic_tokenize=True, use_moran=True,
                  unk_token="[UNK]", sep_token="[SEP]", pad_token="[PAD]", cls_token="[CLS]",
                  mask_token="[MASK]", **kwargs):
         """Constructs a BertTokenizer.
@@ -536,7 +537,7 @@ class HanBertTokenizer(PreTrainedTokenizer):
         self.do_basic_tokenize = do_basic_tokenize
         self.do_lower_case = do_lower_case
         if do_basic_tokenize:
-            self.basic_tokenizer = BasicTokenizer(use_moran=use_moran)
+            self.basic_tokenizer = BasicTokenizer(use_moran=use_moran, moran_file=moran_file)
         self.wordpiece_tokenizer = WordpieceTokenizer(vocab=self.vocab, unk_token=self.unk_token)
 
     @property
