@@ -8,7 +8,7 @@ import numpy as np
 from transformers import BertConfig, DistilBertConfig, BertTokenizer
 from tokenization_hanbert import HanBertTokenizer
 
-from model import BertClassifier, DistilBertClassifier
+from model import BertClassifier
 
 MODEL_CLASSES = {
     'hanbert': (BertConfig, BertClassifier, HanBertTokenizer),
