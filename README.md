@@ -1,6 +1,6 @@
 # HanBert-nsmc
 
-- KoBERT를 이용한 네이버 영화 리뷰 감정 분석 (sentiment classification)
+- HanBert를 이용한 네이버 영화 리뷰 감정 분석 (sentiment classification)
 - 🤗Huggingface Tranformers🤗 라이브러리를 이용하여 구현
 
 ## Dependencies
