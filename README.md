@@ -1,31 +1,61 @@
 # HanBert-nsmc
 
-Naver movie review sentiment classification with HanBert
+- KoBERT를 이용한 네이버 영화 리뷰 감정 분석 (sentiment classification)
+- 🤗Huggingface Tranformers🤗 라이브러리를 이용하여 구현
 
-## Tokenization
+## Dependencies
 
-- tokenization_hanbert.py의 `HanBertTokenizer`를 사용하면 됩니다.
+- torch>=1.1.0
+- transformers>=2.2.2
+- sentencepiece>=0.1.82
 
-### How to use
+## Details
 
-- [HanBert 다운로드 페이지](https://twoblockai.com/2020/01/22/hanbert%eb%a5%bc-%ea%b3%b5%ea%b0%9c%ed%95%a9%eb%8b%88%eb%8b%a4/)로 가서 다운로드
-- tokenizer 관련 c++ 파일 로컬에 옮기기
+기본적인 사용법은 [HanBert-Transformers](https://github.com/monologg/HanBert-Transformers)를 참고
+
+### Prerequisite
+
+- Tokenizer의 경우 현재 Ubuntu에서만 사용 가능
+- HanBert Model 다운로드 (Pretrained weight + Tokenizer) 및 압축 해제
+  - [HanBert-54kN-torch](https://drive.google.com/open?id=1LUyrnhuNC3e8oD2QMJv8tIDrXrxzmdu4)
+  - [HanBert-54kN-IP-torch](https://drive.google.com/open?id=1wjROsuDKoJQx4Pu0nqSefVDs3echKSXP)
+
+### Usage
 
 ```bash
-tar xvfz hanbert.tar.gz
-cd HanBert-54kN/
-sudo mkdir /usr/local/moran
-cp usr_local_moran/* /usr/local/moran
+# 1. Download data
+$ cd data
+$ ./download_data.sh
+
+# 2. Train model and eval
+$ cd ..
+$ python3 main.py --model_type hanbert \
+                  --model_name_or_path HanBert-54kN-torch\
+                  --do_train \
+                  --do_eval
+
+$ python3 main.py --model_type hanbert \
+                  --model_name_or_path HanBert-54kN-IP-torch\
+                  --do_train \
+                  --do_eval
 ```
 
-- HanBert-torch라는 폴더 만든 후, 그 안에 vocab_54k.txt 넣기
+## Results
 
-- 해당 파이썬 실행
+Hyperparameter는 main.py에 있는 것을 그대로 사용하였습니다
 
-```python
->>> from tokenization_hanbert import HanBertTokenizer
->>> tokenizer = HanBertTokenizer.from_pretrained('HanBert-torch', do_lower_case=False)
->>> text = "나는 걸어가고 있는 중입니다. 나는걸어 가고있는 중입니다. 잘 분류되기도 한다. 잘 먹기도 한다."
->>> tokenizer.tokenize(text)
->>> tokenizer.encode_plus(text)
-```
+|                   | Accuracy (%) |
+| ----------------- | ------------ |
+| HanBert-54kN      | **90.16**    |
+| HanBert-54kN-IP   | 88.72        |
+| KoBERT            | 89.63        |
+| DistilKoBERT      | 88.41        |
+| Bert-Multilingual | 87.07        |
+| FastText          | 85.50        |
+
+## References
+
+- [HanBert](https://github.com/tbai2019/HanBert-54k-N)
+- [KoBERT](https://github.com/SKTBrain/KoBERT)
+- [Huggingface Transformers](https://github.com/huggingface/transformers)
+- [NSMC dataset](https://github.com/e9t/nsmc)
