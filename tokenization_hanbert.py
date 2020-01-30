@@ -1,8 +1,9 @@
 # coding=utf-8
-# Modified by TwoBlock Ai
+# Modified by TwoBlock Ai, Jangwon Park
 # for Korean, HanBert + Moran
 #
 # youngcho@tbai.info, youngcho@gmail.com
+# adieujw@gmail.com (https://github.com/monologg)
 #
 # Copyright 2018 The Google AI Language Team Authors.
 #
@@ -40,16 +41,9 @@ logger = logging.getLogger(__name__)
 VOCAB_FILES_NAMES = {'vocab_file': 'vocab_54k.txt',
                      'moran_file': 'libmoran4dnlp.so'}
 
-PRETRAINED_VOCAB_FILES_MAP = {
-    'vocab_file': {},
-    'moran_file': {}
-}
-
-PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES = {
-}
-
 PRETRAINED_INIT_CONFIGURATION = {
-    'HanBert-torch': {'do_lower_case': False},
+    'HanBert-54kN-torch': {'do_lower_case': False},
+    'HanBert-54kN-IP-torch': {'do_lower_case': False}
 }
 
 
@@ -123,28 +117,6 @@ def load_vocab(vocab_file):
     return vocab
 
 
-def convert_by_vocab(vocab, items):
-    """Converts a sequence of [tokens|ids] using the vocab."""
-    output = []
-    for item in items:
-        try:
-            output.append(vocab[item])
-        except:
-            print(vocab)
-            print(item)
-            print("???????")
-            exit()
-    return output
-
-
-def convert_tokens_to_ids(vocab, tokens):
-    return convert_by_vocab(vocab, tokens)
-
-
-def convert_ids_to_tokens(inv_vocab, ids):
-    return convert_by_vocab(inv_vocab, ids)
-
-
 def whitespace_tokenize(text):
     """Runs basic whitespace cleaning and splitting on a piece of text."""
     text = text.strip()
@@ -158,7 +130,12 @@ class BasicTokenizer(object):
     """Runs basic tokenization (punctuation splitting, lower casing, etc.)."""
 
     def __init__(self, use_moran=False, use_zwj=True, moran_file='libmoran4dnlp.so'):
-        self.moran = MorAn16(moran_file)
+        self.moran = None
+        try:
+            self.moran = MorAn16(moran_file)
+        except:
+            logger.warning("Only ubuntu is supported for HanBertTokenizer!")
+
         self.use_moran = use_moran
         self.use_zwj = use_zwj
 
@@ -400,9 +377,7 @@ class HanBertTokenizer(PreTrainedTokenizer):
     """
 
     vocab_files_names = VOCAB_FILES_NAMES
-    pretrained_vocab_files_map = PRETRAINED_VOCAB_FILES_MAP
     pretrained_init_configuration = PRETRAINED_INIT_CONFIGURATION
-    max_model_input_sizes = PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES
 
     def __init__(self, vocab_file, moran_file, do_lower_case=False, never_split=None, do_basic_tokenize=True, use_moran=True,
                  unk_token="[UNK]", sep_token="[SEP]", pad_token="[PAD]", cls_token="[CLS]",
@@ -427,6 +402,7 @@ class HanBertTokenizer(PreTrainedTokenizer):
         super(HanBertTokenizer, self).__init__(unk_token=unk_token, sep_token=sep_token,
                                                pad_token=pad_token, cls_token=cls_token,
                                                mask_token=mask_token, **kwargs)
+        self.max_len = 512  # hard-coded
         self.max_len_single_sentence = self.max_len - 2  # take into account special tokens
         self.max_len_sentences_pair = self.max_len - 3  # take into account special tokens
 
@@ -464,8 +440,17 @@ class HanBertTokenizer(PreTrainedTokenizer):
 
     def convert_tokens_to_string(self, tokens):
         """ Converts a sequence of tokens (string) in a single string. """
-        out_string = ' '.join(tokens).replace(' ##', '').strip()
-        return out_string
+        tok_text = ' '.join(tokens)
+
+        # De-tokenize WordPieces that have been split off.
+        tok_text = tok_text.replace(" ##", "")
+        tok_text = tok_text.replace(" ~~", "")
+        tok_text = tok_text.replace(" ~", "")
+
+        tok_text = tok_text.strip()
+        tok_text = " ".join(tok_text.split())
+
+        return tok_text
 
     def build_inputs_with_special_tokens(self, token_ids_0, token_ids_1=None):
         """
