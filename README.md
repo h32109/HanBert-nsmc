@@ -55,6 +55,6 @@ Hyperparameter는 main.py에 있는 것을 그대로 사용하였습니다
 ## References
 
 - [HanBert](https://github.com/tbai2019/HanBert-54k-N)
-- [KoBERT](https://github.com/SKTBrain/KoBERT)
+- [NSMC result on KoBERT](https://github.com/monologg/KoBERT-nsmc)
 - [Huggingface Transformers](https://github.com/huggingface/transformers)
 - [NSMC dataset](https://github.com/e9t/nsmc)
