@@ -131,6 +131,10 @@ dmypy.json
 #################
 .vscode/
 .idea/
-HanBert-torch/
+
+HanBert-54kN-torch
+HanBert-54kN-IP-torch
 usr_local_moran/
 model/
+
+.DS_Store

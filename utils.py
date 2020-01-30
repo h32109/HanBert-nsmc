@@ -5,17 +5,13 @@ import logging
 import torch
 import numpy as np
 
-from transformers import BertConfig, DistilBertConfig, BertTokenizer
+from transformers import BertConfig
 from tokenization_hanbert import HanBertTokenizer
 
 from model import BertClassifier
 
 MODEL_CLASSES = {
     'hanbert': (BertConfig, BertClassifier, HanBertTokenizer),
-}
-
-MODEL_PATH_MAP = {
-    'hanbert': 'HanBert-torch'
 }
 
 

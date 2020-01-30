@@ -1,7 +1,7 @@
 import argparse
 
 from trainer import Trainer
-from utils import init_logger, load_tokenizer, MODEL_CLASSES, MODEL_PATH_MAP
+from utils import init_logger, load_tokenizer, MODEL_CLASSES
 from data_loader import load_and_cache_examples
 
 
@@ -31,6 +31,7 @@ if __name__ == '__main__':
     parser.add_argument("--test_file", default="ratings_test.txt", type=str, help="Test file")
 
     parser.add_argument("--model_type", default="hanbert", type=str, help="Model type selected in the list: " + ", ".join(MODEL_CLASSES.keys()))
+    parser.add_argument("--model_name_or_path", default="HanBert-54kN-torch", type=str, help="Path to pre-trained model or shortcut name")
 
     parser.add_argument('--seed', type=int, default=42, help="random seed for initialization")
     parser.add_argument("--batch_size", default=32, type=int, help="Batch size for training and evaluation.")
@@ -55,5 +56,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    args.model_name_or_path = MODEL_PATH_MAP[args.model_type]
     main(args)
