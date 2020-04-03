@@ -5,8 +5,8 @@
 
 ## Dependencies
 
-- torch>=1.1.0
-- transformers>=2.2.2
+- torch==1.4.0
+- transformers==2.7.0
 
 ## Details
 
@@ -37,6 +37,12 @@ $ python3 main.py --model_type hanbert \
                   --model_name_or_path HanBert-54kN-IP-torch\
                   --do_train \
                   --do_eval
+```
+
+## Prediction
+
+```bash
+$ python3 predict.py --input_file {INPUT_FILE_PATH} --output_file {OUTPUT_FILE_PATH} --model_dir {SAVED_CKPT_PATH}
 ```
 
 ## Results

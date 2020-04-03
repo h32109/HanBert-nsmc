@@ -5,13 +5,11 @@ import logging
 import torch
 import numpy as np
 
-from transformers import BertConfig
+from transformers import BertConfig, BertForSequenceClassification
 from tokenization_hanbert import HanBertTokenizer
 
-from model import BertClassifier
-
 MODEL_CLASSES = {
-    'hanbert': (BertConfig, BertClassifier, HanBertTokenizer),
+    'hanbert': (BertConfig, BertForSequenceClassification, HanBertTokenizer),
 }
 
 
